@@ -1,0 +1,59 @@
+<!-- templates/logger/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Number Counter</title>
+</head>
+<body>
+    What should I count to?<br>
+    <form method="post">{% csrf_token %}</form>
+    <input id="counter-max-input" type="number" min="1" max="300" size="100"><br>
+    <input id="counter-max-submit" type="button" value="New Counter">
+
+    <script>
+        // Get CSRF Token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        document.querySelector('#counter-max-input').focus();
+        document.querySelector('#counter-max-input').onkeyup = function(e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#counter-max-submit').click();
+            }
+        };
+
+        document.querySelector('#counter-max-submit').onclick = async function(e) {
+            let maxCount = document.querySelector('#counter-max-input').value;
+            if (maxCount < 1 || maxCount > 300) {
+                alert("Invalid count value!!!");
+                return;
+            }
+            let data = {
+                'max_count': maxCount,
+            }
+            let response = await fetch("{% url 'counter:new-counter' %}", {
+                method: 'POST',
+                headers: {'X-CSRFToken': csrftoken},
+                body: JSON.stringify(data),
+            });
+            let response_data = await response.json();
+            window.location.pathname = response_data.counter_url;
+        };
+    </script>
+</body>
+</html>
