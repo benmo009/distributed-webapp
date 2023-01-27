@@ -51,7 +51,7 @@
             pauseButton.removeAttribute('disabled');
         }
 
-        document.querySelector('#pause-count-submit').onclick = function(e) {
+        pauseButton.onclick = function(e) {
             // Pause counter
             counterSocket.send(JSON.stringify({
                 "message": "pause count",
