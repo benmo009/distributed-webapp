@@ -9,6 +9,56 @@
     <h1>{{ counter }}</h1>
     <p>Counting to {{counter.max_count}}</p>
     <textarea id="count-log" cols="100" rows="20"></textarea><br>
-    <input id="pause-count-submit" type="button" value="Pause">
+    <input id="start-count-submit" type="button" value="Start">
+    <input id="pause-count-submit" type="button" value="Pause" disabled>
+
+    <script>
+        const countLogger = document.querySelector('#count-log');
+        const startButton = document.querySelector('#start-count-submit');
+        const pauseButton = document.querySelector('#pause-count-submit');
+
+        // Pre-populate logger
+        countLogger.value = "";
+        let currentCount = parseInt("{{counter.current_count}}");
+        for(let i = 0; i <= currentCount; i++) {
+            countLogger.value += ("Step " + i + "\n");
+        }
+
+        // Websocket Functions
+        const counterSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + "{{ counter.get_websocket_url }}"
+        )
+
+        counterSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            countLogger.value += (data.message + "\n");
+        }
+
+        counterSocket.onclose = function(e) {
+            console.error('Counter socket closed unexpectedly');
+            countLogger.value += ('socket closed\n');
+        }
+
+        // Button Functions
+        startButton.onclick = function(e) {
+            // Flag counter start
+            counterSocket.send(JSON.stringify({
+                "message": "start count",
+            }));
+            startButton.setAttribute('disabled', 'true');
+            pauseButton.removeAttribute('disabled');
+        }
+
+        document.querySelector('#pause-count-submit').onclick = function(e) {
+            // Pause counter
+            counterSocket.send(JSON.stringify({
+                "message": "pause count",
+            }));
+            pauseButton.setAttribute('disabled', 'true');
+            startButton.removeAttribute('disabled');
+        }
+    </script>
 </body>
 </html>

@@ -20,3 +20,6 @@ class CountProcess(BaseTimestamp):
 
     def get_absolute_url(self):
         return reverse("counter:counter-log", args=[self.id])
+
+    def get_websocket_url(self):
+        return f"/ws{self.get_absolute_url()}/"
