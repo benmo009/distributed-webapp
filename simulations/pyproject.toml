@@ -1,0 +1,13 @@
+[project]
+name = "simulations"
+version = "0.0.1"
+authors = [
+    { name="ben", email="benmo009@gmail.com" },
+]
+description = "Simple simulation packages"
+readme = "README.md"
+requires-python = ">=3.7"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

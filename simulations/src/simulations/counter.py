@@ -11,8 +11,3 @@ class Counter:
             self.current_count += 1
             print(self.current_count)
             time.sleep(0.5)
-
-
-if __name__ == "__main__":
-    counter = Counter(max_count=20)
-    counter.run()
