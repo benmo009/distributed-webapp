@@ -16,7 +16,7 @@
         const countLogger = document.querySelector('#count-log');
         const startButton = document.querySelector('#start-count-submit');
         const pauseButton = document.querySelector('#pause-count-submit');
-
+        
         // Pre-populate logger
         countLogger.value = "";
         let currentCount = parseInt("{{counter.current_count}}");
@@ -33,6 +33,17 @@
 
         counterSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
+
+            switch (data.type) {
+                case "start_ack":
+                    startButton.setAttribute('disabled', 'true');
+                    pauseButton.removeAttribute('disabled');
+                    break;
+                case "pause_ack":
+                    pauseButton.setAttribute('disabled', 'true');
+                    startButton.removeAttribute('disabled');
+                    break;
+            }
             countLogger.value += (data.message + "\n");
         }
 
@@ -45,19 +56,15 @@
         startButton.onclick = function(e) {
             // Flag counter start
             counterSocket.send(JSON.stringify({
-                "message": "start count",
+                "type": "start",
             }));
-            startButton.setAttribute('disabled', 'true');
-            pauseButton.removeAttribute('disabled');
         }
 
         pauseButton.onclick = function(e) {
             // Pause counter
             counterSocket.send(JSON.stringify({
-                "message": "pause count",
+                "type": "pause",
             }));
-            pauseButton.setAttribute('disabled', 'true');
-            startButton.removeAttribute('disabled');
         }
     </script>
 </body>
